@@ -1,0 +1,181 @@
+package.json:
+    É o arquivo principal de qualquer projeto em Node.js. É utilizado como arquivo manifesto, centralizando todas as informações necessárias para entender os componentes de um projeto, por exemplo:
+        Bibliotecas e dependências utilizadas em produção e desenvolvimento.
+        Scripts utilizados pelo projeto para executar o projeto, como subir servidores, rodar testes, compilar arquivos para produção etc.
+        Informações sobre versionamento, repositório do código, contato do time responsável.
+        Informações sobre configurações diversas.
+        Dados necessários para a publicação do pacote no NPM (gerenciador de pacotes do Node.js).
+
+    Vamos entender e detalhar alguns desses atributos:
+
+        name: é onde se define o nome pelo qual seu módulo será chamado.
+        version: versão atual do módulo. O NPM utiliza o chamado versionamento semântico (SemVer). Você pode saber mais sobre versionamento e como ele é utilizado neste artigo.
+        description: define o que será este módulo. É ideal que seja uma descrição curta e clara sobre o objetivo principal.
+        main: define o ponto de entrada da aplicação.
+        scripts: essa sessão tem alguns scripts pré-definidos, mas você também pode definir os seus personalizados. Leia sobre scripts no npm Docs ter mais informações.
+        keywords: é um array de palavras-chave sobre o projeto.
+        author: são dados de autoria, podendo conter nome, e-mail, site etc.
+        license: é a licença escolhida para o projeto. Existem diversas opções de licenças, caso tenha curiosidade você pode conferir a lista completa de licenças no site do SPDX.
+        dependencies: define a lista de pacotes necessários para executar seu projeto num ambiente de produção.
+        devDependencies: define a lista de pacotes necessários para executar o projeto em um ambiente de desenvolvimento e testes. Existem outras configurações que podem existir nesse arquivo, como repositório do Git, homepage, peerDependencies, entre outras que podem ser visualizadas na documentação oficial do NPM.        
+
+nodemon:
+    "Passo 1.": com o código "npm install" , é detectado pelo servidor toda vez que alteramos o código automaticamente ao salvar o script. ao instalar ela já atualizad o packe .json com 
+    "Passo 2.": no package.json, a parte de script deve ficar assim, com o código '"dev": "nodemon server.js",'
+        "scripts": {
+            "dev": "nodemon server.js",
+            "test": "echo \"Error: no test specified\" && exit 1"
+        }
+    "Passo 3.": no terminal, rodar "npm run dev"
+    
+    
+
+
+Criação de um projeto Node.js 
+    com o código "npm init -y" é criadp um novo arquivo package.json,
+    com algumas informações padrão, que é o que acontece quando usamos a flag (bandeira) -y.
+
+
+"type": "module",
+    Para importar e exportar partes, as funções, os módulos do projeto em Js, utilizando a sintaxe mais moderna do JavaScript.:
+    adcionar ao package.json, abaixo de description: 
+        Exemplo: 
+            "type": "module"
+
+            
+    
+Criação de um Servidor
+    A primeira coisa que fazemos quando vamos criar uma API que precisa fornecer informações para outras partes do sistema é criar um servidor para justamente fornecer os dados, servindo como ponto de conexão.
+
+
+Api:
+    Portas /  portas lógicas: 
+        são gerenciadas pelo sistema operacional e agem como pontos onde conexões de rede acontecem. Por exemplo, a comunicação com a API que estamos desenvolvendo se dá através da porta 3000.         são gerenciadas pelo sistema operacional e agem como pontos onde conexões de rede acontecem. Por exemplo, a comunicação com a API que estamos desenvolvendo se dá através da porta 3000.         80 é a porta padrão de conexões HTTP, usada pelos navegadores. 5432 é usada para conexão com serviços do banco de dados PostgreSQL. 3306/3307 são usadas em conexões com o banco MySQL. 587 utilizada para conexões SMTP (Simple Mail Transfer Protocol, o protocolo de envio e recebimento de e-mails).
+        portas são de “uso comum” e podem ser utilizadas por qualquer serviço, como a 3000
+
+
+    Header / Cabeçalho: 
+        todo Header HTTP: as infos necessarios para fazer a comunicação funcionar, são elas: 
+            1. Resposta de Status da resquisação 
+            2. Protoculo utilizado: HTTP
+            3. Host: pra onde esta sendo a requisisao (site "google.com")
+            4. User-Agent:  que designa quem faz a requisição, podendo ser um navegador, o Curl (programa de terminal) ou o Postman, por exemplo
+            5. accecpt: tipo de dados que serão aceitos como resposta que geralmente são de texto ou JavaScript.
+        
+
+Comandos de Requisição e Resposta:
+
+    Res
+        .writeHead(statusARetornar, "Formatação do Conteudo")    //se 
+        .end("Isso aqui é o que será escrito")
+
+        Exeplo:
+            const server = http.createServer(( req, res ) =>{
+                res.writeHead(200, { "Content-Type": "text/plain" });
+                res.end("Curso de Node.js")
+
+            });
+
+
+Criando um Servidor Local
+    Através do método createServer toda vez que o servidor HTTP receber uma requisição, a função de callback passada para o método será executada.
+
+    Exemplo de um código{
+        import http from 'http' //Importando a biblioteca nativa(/interna) do Node; ao chamar no topo do arquivo, o Node já acessa os dados dessa biblioteca.
+
+        const port = 3000   //para deixar variavel a porta 
+
+        //Forma 2 de consumo de rotas: utilizando o contexto da url passado, definido em end,  para utilizado no conteudo da paginá da rota.
+        const rotas = {
+            "/": "Curso de Express API",
+            "/livros": "Entrei na rota livros",
+            "/autores": "Entrei na rota autores"
+        };  
+
+        //Através do método createServer toda vez que o servidor HTTP receber uma requisição, a função de callback passada para o método será executada.
+        const server = http.createServer((req, res) => {
+            res.writeHead(200, { "Content-Type": "text/plain" });
+            res.end(rotas[req.url]);
+        });
+
+        //Forma 1 de consumo de rotas, mais simples: definido explicitamente em end, o conteúdo da página.
+        // const server = http.createServer(( req, res ) =>{
+        //     res.writeHead(200, { "Content-Type": "text/plain" });   //Este método é referente ao cabeçalho (ou header) da requisição HTTP.  //Toda comunicação HTTP, tanto a requisição quanto a resposta, tem cabeçalhos. Os cabeçalhos contêm todas as informações necessárias para que a comunicação funcione corretamente.// Nele há informações contidas como: o Host para o qual a requisição é feita; o User-Agent, que designa quem faz a requisição, podendo ser um navegador, o Curl (programa de terminal) ou o Postman, por exemplo; e o tipo de dado aceito na requisição (Accept), que nesse caso, pode ser texto ou JavaScript.
+        //     res.end("C
+        
+        urso de Node.js")
+        // });
+
+
+        //O método listen é o que vai definir o endereço no qual o servidor vai ficar escutando as requisições e geralmente já o chamamos depois do servidor estar criado
+        server.listen(port , () => 
+            console.log("Servidor Escutando!")
+        )
+    }
+
+
+Express
+
+
+
+REST : Representação de Estado de Transferencia: Cominucação Distribuida
+
+    Modelo de CLiente servidor
+
+    STATELESSNESS
+
+    JWT: código de dados de identificação
+
+    interface uniforme
+    Recursos devem ser identificaveis
+
+    Manipulação de recursos devem ser 
+
+
+    REST(Representational State Transfer, que significa Transferência Representacional de Estado) é um modelo de arquitetura e não uma linguagem ou tecnologia de programação, que fornece diretrizes para que os sistemas distribuídos se comuniquem diretamente usando os princípios e protocolos existentes da Web sem a necessidade de SOAP ou outro protocolo sofisticado.
+
+    A origem do termo REST
+    Os conceitos do REST foram submetidos à tese de doutorado de Roy Fielding nos anos 2000, onde o princípio fundamental é usar o protocolo HTTP para comunicação de dados.
+
+    Esta arquitetura usa várias representações de recursos para representar seu tipo, como XML, JSON, Texto, Imagens e assim por diante.
+    Vale ressaltar que o REST não se limita a solicitações e respostas de registros. Também é possível inserir um novo registro ou deletar um já existente.
+
+    Responsabilidades no REST
+    Existe no REST um princípio chamado STATELESSNESS (sem estado), onde o servidor não precisa saber em qual estado o cliente está e vice-versa. Mas o que é um servidor e um cliente?
+
+    Cliente: é o componente solicitante de um serviço e envia solicitações para vários tipos de serviços ao servidor.
+
+    Servidor: É o componente que é o provedor de serviços e fornece continuamente serviços ao cliente conforme as solicitações
+
+    Nesta arquitetura ou modelo, cliente-servidor ajuda na separação de responsabilidades entre a interface do usuário e o armazenamento de dados. Ou seja, quando uma solicitação REST é realizada, o servidor envia uma representação dos estados que foram requeridos.
+
+    Não há limite superior no número de clientes que podem ser atendidos por um único servidor. Também não é obrigatório que o cliente e o servidor residam em sistemas separados.
+
+    A comunicação entre cliente e servidor ocorre através da troca de mensagens usando um padrão de solicitação-resposta. O cliente basicamente envia uma solicitação de serviço e o servidor retorna uma resposta.
+
+    Requisições e comunicações
+    O REST precisa que um cliente faça uma requisição para o servidor para enviar ou modificar dados. Um requisição consiste em:
+
+    Um verbo ou método HTTP, que define que tipo de operação o servidor vai realizar;
+    Um header, com o cabeçalho da requisição que passa informações sobre a requisição;
+    Um path (caminho ou rota) para o servidor, como por exemplo https://www.alura.com.br/artigos/golang-trabalhando-com-datas;
+    Informação no corpo da requisição, sendo esta informação opcional.
+    Métodos HTTP
+    Em aplicação REST, os métodos mais utilizados são:
+
+    O método GET é o método mais comum, geralmente é usado para solicitar que um servidor envie um recurso;
+    O método POST foi projetado para enviar dados de entrada para o servidor. Na prática, é frequentemente usado para suportar formulários HTML;
+    O método PUT edita e atualiza documentos em um servidor;
+    O método DELETE que como o próprio nome já diz, deleta certo dado ou coleção do servidor.
+    Neste link você encontrará a lista completa de todos os métodos.
+
+    Códigos de Respostas
+    Cada resposta que a aplicação REST retorna, é enviado um código definindo o status da requisição. Por exemplo:
+
+    200 (OK), requisição atendida com sucesso;
+    201 (CREATED), objeto ou recurso criado com sucesso;
+    204 (NO CONTENT), objeto ou recurso deletado com sucesso;
+    400 (BAD REQUEST), ocorreu algum erro na requisição (podem existir inumeras causas);
+    404 (NOT FOUND), rota ou coleção não encontrada;
+    500 (INTERNAL SERVER ERROR), ocorreu algum erro no servidor.
+    Estes são os principais, porém neste link você encontrará a lista completa do código de cada requisição.
