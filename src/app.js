@@ -1,95 +1,34 @@
-// import express from "express";
-// const app = new express();  //Necessario instancia o express
-// app.get("/", (req, res ) => {
-//     res.status(200).send("Curso Node JS")
-// })
+//Construindo um servidor web usando o framework Express em Node.js, conectando-se a um banco de dados MongoDB, e definindo rotas para o servidor.
 
-import express from 'express';
-import conectaNaDatabase from './config/dbConnect.js';   //Sempre colocar o .js ao final da importação
-import livro from "./models/Livro.js";
+//Sempre colocar o .js ao final da importação dos scripts 
 
-const conexao = await conectaNaDatabase();  //armazenando a conexão
+import express from "express";                              //É o módulo principal do Express, utilizado para criar e configurar um aplicativo web.
+import conectaNaDatabase from "../src/config/dbConnect.js"  //Importando a função de conexão com o BD do MongoDB
+import routes from "./routes/index.js"                      //importado do arquivo index.js, Um módulo que contém as definições de rotas para o aplicativo.
 
-//Tratando erros de conxão com o BD Mongo
-conexao.on("error", (erro) =>{
-    console.error("Erro de Conexão com o Banco de Dados.", erro)    
+const conexao = await conectaNaDatabase();  // estabelecendo a conexão  //await indica que a operação é assíncrona e deve aguardar a conclusão antes de continuar.
+
+
+//On e Once são métodos para trabalhar com eventos de conexão, solicitação HTTP, entre outros. São fornecidos pelo EventEmitter, um módulo principal no Node.js 
+
+//O método on é usado para registrar um ouvinte de eventos para um evento específico.
+//No caso, esta tratando erros de conxão com o BD Mongo, com o evento "error"
+conexao.on("error", (erro) => {
+  console.error("erro de conexão", erro);
 });
 
-//a biblioteca Mongoose, funciona como uma interface prase se conectar ao BD do Mongo
-//então ela se conecta com a string de conexao e passa informação de retorno para o metodo Once.
-conexao.once("open", (open) =>{
-    console.log("Conexao feita com Sucesso!")
+//O método once é semelhante ao on, mas o once será chamado SOMENTE 1 vez para o evento especificado.
+//Com o Evento Open, então se conecta com a string de conexao do BD e passa informação de retorno para o metodo Once.
+conexao.once("open", () => {
+  console.log("Conexao com o banco feita com sucesso");
 })
 
-const app = express();
-//Sem isso, não consegue adicionar objetos vindos de arra, para outro array ( recebe null )
-app.use(express.json()) //Parametro de Body vem em String e precisa ser convertido para JSON. //Esse recurso é um Midleware: Executara qualquer parametro de tipo que chegue por meio do body, será 
 
+//Um aplicativo Express é criado chamando a função express(), a instância resultante é armazenada na variável app.
+const app = express();    
 
+//A função routes é chamada passando a instância do aplicativo app. Isso configura as rotas definidas no arquivo index.js para o aplicativo.
+routes(app);              
 
-//Acessando a Raiz do Site, apenas pra vericar rota
-app.get("/", (req, res) => {        
-    res.status(200).send("Curso de Node.js");
-});
+export default app; //O aplicativo Express configurado é exportado para que possa ser utilizado em outros arquivos.
 
-//Acesasndo as Coleções de Livros
-//callback da função deve ser definida como assincrona. async antes do callback e await ao receber o conteudo da consulta na coleção pelo find. 
-//O find é quem se conecta a coleção, busca e retorna tudo que ele encontrar por lá.
-app.get("/livros", async (req, res) => {
-    const listaLivros = await livro.find();
-    res.status(200).json(listaLivros);
-    //res.status(200).json(livros)    
-});
-
-
-app.get("/livros/:id", (req, res) => {    
-    const index = buscaLivrosPorId(req.params.id)
-    res.status(200).json(livros[index]);
-});
-
-
-app.post("/livros", (req, res) => {
-    livros.push(req.body);
-    res.status(201).send("Livro cadastrado com Sucesso")
-})
-
-app.put("/livros/:id", (req, res) => {    
-    const index = buscaLivrosPorId(req.params.id)
-    livros[index].Titulo = req.body .Titulo
-    res.status(200).json(livros[index]);
-});
-
-app.delete("/livros/:id", (req, res) => {    
-    const index = buscaLivrosPorId(req.params.id)
-    livros.splice(index, 1)
-    res.status(201).send("Livro Deletado com Sucesso")
-});
-
-export default app
-
-
-/* 
-
-//Primeiro array de livros, simulando uma coleção de livros do MongoDB
-const livros = [
-    {
-        id: 1,
-        Titulo: "Senhor dos Aneis"
-    },
-    {
-        id: 2,
-        Titulo: "O Hobbit"
-    }
-]
-
-
-// estava relacionada ao array
-function buscaLivrosPorId(id){
-    return livros.findIndex(livro => livro.id === Number(id) )
-    //ou: 
-    //return livros.findIndex(livro => { 
-    //    return livro.id === Number(id) } 
-    //)
-}
-
-*/

@@ -179,3 +179,78 @@ REST : Representação de Estado de Transferencia: Cominucação Distribuida
     404 (NOT FOUND), rota ou coleção não encontrada;
     500 (INTERNAL SERVER ERROR), ocorreu algum erro no servidor.
     Estes são os principais, porém neste link você encontrará a lista completa do código de cada requisição.
+
+// Diagrama de Fluxo das APIs Rest com Express com MVC
+    desde a requisição HTTP até a consulta (query) feita ao banco de dados. A comunicação entre as camadas de model e controller é uma caminho de ida e volta, pois o model vai repassar o resultado da consulta para o controller para que seja processada e transformada na resposta HTTP no formato adequado e com as informações esperadas.
+
+    1. Requisição da Rota \Livros;
+    2. Rota \Livros chama o controller de Livros, repassando os parametros da requisição;
+    3. Controller de Livros ( que contém a função que chama a Listagem de Livros ), Processa a requisição e chama o Modelo(Model Livros);
+    4. O Modelo de Livros conecta com o banco de dados, no caso MongoDb
+    5. O MongoDB e processa a query(consulta), e devolve a resposta da requisição ao Modelo ;
+    6. o Modelo processa o resultado e repassa ao controller
+    7. O controller, monta a resposta HTTP para o Cliente
+    8. Envio da Resposta HTTP pro cliente pelo controller.
+
+    Requisição da Rota \Livros -> controller de Livros -> O Modelo de Livros -> Banco de Dados(MongoDB) -> Retorno ao Modelo -> Retorno ao Controller -> retorno ao Cliente
+    
+
+
+//CONCEITOS APRENDIDOS
+    Como os bancos de dados atuam integrados a uma API, guardando os dados recebidos e processados pela API;
+    Quais são as principais diferenças entre tipos de bancos de dados SQL e NoSQL e alguns casos de uso de cada tipo de banco;
+    Como utilizar uma instância gratuita de um banco MongoDB na nuvem através do serviço Mongo Atlas e conectar a instância com a API;
+    Os conceitos de model e schema e qual a função de cada na construção de uma API.
+
+
+MONGOOSE:
+
+    NOÇÕES BASICAS DE MONGOOSE COM EXEMPLOS:
+        Nesta aula conhecemos os models e criamos um model para livros utilizando os métodos do Mongoose.
+
+        Vamos revisar o código do modelo e do schema correspondente.
+
+        No arquivo src/models/Livro.js
+
+        Importe o módulo mongoose;
+        Crie um esquema chamado livroSchema usando o construtor mongoose.Schema;
+        Defina as seguintes propriedades no esquema:
+        id como tipo mongoose.Schema.Types.ObjectId;
+        titulo como tipo String e obrigatório;
+        editora como tipo String;
+        preco como tipo Number;
+        paginas como tipo Number.
+        Passe um objeto como segundo parâmetro para mongoose.Schema com a propriedade versionKey definida como false;
+        Crie um modelo chamado livro usando o método mongoose.model, passando a string livros como nome da coleção e o esquema livroSchema;
+        Exporte o modelo livro como default (padrão).    
+
+    ERROS DE MONGOOSE:
+        Se, ao invés dos dados solicitados (por exemplo, um array de objetos ou um objeto livro), alguma das variáveis estiver retornando o valor Promise { <pending> }, é possível que exista alguma promessa não resolvida em alguma parte do código.
+
+        Verifique se todas as funções assíncronas do projeto, em especial as que fazem chamadas a métodos do Mongoose, estão devidamente assinaladas com async/await. Por exemplo:
+
+        app.get('/livros', async (req, res) => {
+        const listaLivros = await livro.find({});
+        res.status(200).json(listaLivros);
+        });
+        COPIAR CÓDIGO
+        Note que, no caso de funções callback, a palavra-chave async deve ser adicionada antes dos parâmetros e await antes da instrução da variável.
+
+        No caso de declarações de função, async deve ser adicionada antes de function:
+
+        async function conectaNaDatabase() {
+        mongoose.connect(process.env.DB_CONNECTION_STRING);
+        return mongoose.connection;
+        }
+        COPIAR CÓDIGO
+        Note que, no exemplo acima, não é necessário adicionar await pois return já é implicitamente assíncrono.
+
+        Em caso de dúvidas, basta consultar os commits feitos no repositório do curso no GitHub.
+
+        Nome do banco
+        Não esqueça de adicionar o nome da database livraria na string de conexão do Mongo Atlas, após o caminho principal, conforme feito em vídeo:
+
+        mongodb+srv://admin:<suasenha>@cluster0.uvmwiwx.mongodb.net/livraria?retryWrites=true&w=majority
+        COPIAR CÓDIGO
+        Isso garante que a conexão será feita para a database correta e a coleção livros será criada nesta database, especialmente se você tiver outras databases de teste em seu cluster.        
+
