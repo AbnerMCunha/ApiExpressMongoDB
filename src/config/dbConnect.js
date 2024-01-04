@@ -30,13 +30,14 @@ import mongoose from "mongoose";    //biblioteca para interagir com o MongoDB de
 //13.2.7 No nosso caso, o ponto mais externo é o server.js, que está na pasta raiz "src".
 // No início desse arquivo server.js, acima da linha de importação do app,importe o .env utilizando o comando abaixo.
 // Exemplo: import "dotenv/config".
+//14. Se estiver utilizando o eslint, altere a configuração para poder utilizar as variaveis de ambiente sem aparecer erros. :
+//  alterar de { "browser" : true, } para node recebendo true ao configurar as variaveis de ambiente, em .eslintrc.json
 
 
 //A palavra-chave async indica que a função retornará uma Promise e pode conter operações assíncronas.
 async function conectaNaDatabase(){
-    mongoose.connect(process.env.DB_CONNECTION_STRING);     //process.env : é um objeto que contém informações sobre o ambiente do sistema e é uma maneira de acessar variáveis de ambiente no Node.js. 
-
-    return mongoose.connection;
+  mongoose.connect(process.env.DB_CONNECTION_STRING);     //process.env : é um objeto que contém informações sobre o ambiente do sistema e é uma maneira de acessar variáveis de ambiente no Node.js. 
+  return mongoose.connection;
 }
 
 export default conectaNaDatabase;
