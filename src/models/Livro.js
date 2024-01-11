@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-//import {AutorSchema } from "./Autor.js"; importação de embedding
+//import {autorSchema } from "./Autor.js"; importação de embedding
 
 //Schema: objeto de configuração que define a estrutura e as propriedades de um livro de uma entidade 
 //(Como se fosse os atributos e definições de constraints de tabelas relacionais), 
@@ -15,7 +15,7 @@ const livroSchecma = new mongoose.Schema(
     preco: { type: Number } ,
     paginas: { type: Number } ,
     //autor :  { type: String } ,   //1. Sem vinculação de entidade no atributo string;
-    //autor :  AutorSchema          //2. Vinculação de Entidades/Modelos por Embbeding. Altera o Cadastro do Livro. na pratica, ele salva as informações do registro no momento do cadastro. se o objeto real posteriomente for alterado. pelo embedding, nos outros lugares que não tiver sido alterado. se manterá desatualizado.
+    //autor :  autorSchema          //2. Vinculação de Entidades/Modelos por Embbeding. Altera o Cadastro do Livro. na pratica, ele salva as informações do registro no momento do cadastro. se o objeto real posteriomente for alterado. pelo embedding, nos outros lugares que não tiver sido alterado. se manterá desatualizado.
     autor : { type: mongoose.Schema.ObjectId, ref: "autores", 
       required: [true, "O Nome do(a) Autor(a), é Obrigatório."] // 1 parametro, se refere a obrigatóriedade, o 2º é a Mensagem personalizada caso a condição não seja satizfeita.
     }  //3. Vinculação de Entidades/Modelos Referencia. Não altera o cadastro do livro, mas sim a consulta. Só salva o id do registro e no momento de Consulta ele busca os dados atualizados. Referencing é o melhor.

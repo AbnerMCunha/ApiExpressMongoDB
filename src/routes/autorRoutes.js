@@ -1,7 +1,7 @@
 //Rotas de autores
 
 import express from "express";
-import AutorController from "../controllers/autorController.js";
+import AutorController from "../controllers/autoresController.js";
 
 const routes = express.Router();
 

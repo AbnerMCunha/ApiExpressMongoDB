@@ -1,7 +1,7 @@
 //Rotas de Livros com as Operações em CRUD
 
 import express from "express";  //módulo principal do Express, pra criar e configurar rotas.
-import LivroController from "../controllers/livroController.js";    //Um controlador que contém métodos para lidar com as operações relacionadas a livros.
+import LivroController from "../controllers/livrosController.js";    //Um controlador que contém métodos para lidar com as operações relacionadas a livros.
 
 const routes = express.Router();    // Cria um objeto Router do Express que pode ser usado para definir rotas.
 
