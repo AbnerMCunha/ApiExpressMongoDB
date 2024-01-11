@@ -11,9 +11,33 @@ const livroSchecma = new mongoose.Schema(
     //1º jeito titulo: {type: mongoose.Schema.Types.String }   //Exemplo extenso para definir uma string
     //2º jeito + simples, definindo com S de String, em Maiusculo:
     titulo: {type: String , required: [true, "O Titulo é Obrigatório."]}, // required: true, o que significa que a propriedade titulo é obrigatória, 2º parametro do array é a mensagem personalizada  de validação.
-    editora: { type: String } ,
+    editora: { 
+      type: String ,
+      //Enum: opções limitadas e especificas já predefinidas.
+      //enum: ["C#" , "JS"]   //Verão simples
+      //Versão com mensagem personalizada
+      enum: { 
+        values : ["C#" , "JS"], 
+        message : "Editora '{VALUE}' não é um valor permitido."
+      } 
+    },
     preco: { type: Number } ,
-    paginas: { type: Number } ,
+    paginas: { 
+      type: Number ,
+      //min: [10,  "O número de páginas deve estar entre 10 e 5000. Valor fonecido : {VALUE}"],
+      //max: [5000 ,  "O número de páginas deve estar entre 10 e 5000.Valor fonecido : {VALUE}"],
+
+      //Versão com message pesonalizada:
+      numeroPaginas: {
+        type: Number,
+        validate: {
+          validator: (valor) => {
+            return valor >= 10 && valor <= 5000;
+          },
+          message: "O número de páginas deve estar entre 10 e 5000. Valor fornecido: {VALUE}"
+        }
+      } 
+    },
     //autor :  { type: String } ,   //1. Sem vinculação de entidade no atributo string;
     //autor :  autorSchema          //2. Vinculação de Entidades/Modelos por Embbeding. Altera o Cadastro do Livro. na pratica, ele salva as informações do registro no momento do cadastro. se o objeto real posteriomente for alterado. pelo embedding, nos outros lugares que não tiver sido alterado. se manterá desatualizado.
     autor : { type: mongoose.Schema.ObjectId, ref: "autores", 

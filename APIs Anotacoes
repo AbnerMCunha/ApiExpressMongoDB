@@ -311,3 +311,61 @@ Status Code HTTP
     Mensagens de redirecionamento (300 – 399)
     Respostas de erro do cliente (400 – 499)
     Respostas de erro do servidor (500 – 599)
+
+
+
+Node.js: Lidando com buscas, filtros, paginação e erros em uma API 
+    Aula 2  lidando com buscas, filtros, paginação e erros em uma API Tratamento de Erros Personalizado
+        Criar e utilizar um middleware de manipulador de erros:
+            Esse middleware é caracterizado por receber quatro parâmetros, convencionalmente chamados de: erro, req, res e next. Foi nele que centralizamos o tratamento da maioria dos erros que poderiam acontecer na aplicação, possibilitando a reutilização de código. E, de acordo com o erro recebido, ele pode encerrar o fluxo de requisição ao enviar uma resposta de erro padronizada para o cliente, utilizando o objeto res.
+
+        Identificar e tratar erros de validação:
+
+            É possível identificar um erro de validação do Mongoose ao verificar se o erro é uma instância de mongoose.Error.ValidationError. Também aprendemos como personalizar as mensagens de validação nos Schemas do Mongoose e como obtê-las no objeto de erro.
+
+        Refatorar o manipulador de erros utilizando classes:
+
+            Nos aproveitamos dos conceitos da orientação a objetos para criar classes para cada erro, reduzindo o código e tornando-o mais legível.
+
+        Criar um middleware para tratar páginas 404:
+            Esse middleware deve ser registrado após todas as outras rotas da aplicação. Assim, se nenhuma das rotas registradas tiver sido correspondida, o código desse middleware será executado. Em seguida, nele podemos criar um erro (no nosso caso, uma nova instância da classe NaoEncontrado) e enviá-lo para o manipulador de erros.
+
+
+    Aula 3 - Validações Mongoose
+
+         {VALUE} :  Para recuperar o valor definido na requisição ao tratar o erro de validação
+
+        MIN MAX
+            Validação basica: 
+                Exemplo: Dentro da Declaração de propriedade Da ClasseSchema no modelo da entidade:
+                    numeroPaginas: {
+                        type: Number
+                        min: 10,
+                        max: 5000
+                    }
+
+            Validação com personalização da Mensagem de respostas da validação.
+                paginas: { 
+                type: Number ,
+                min: [10,  "O número de páginas deve estar entre 10 e 5000. Valor fonecido : {VALUE}"],
+                max: [5000 ,  "O número de páginas deve estar entre 10 e 5000.Valor fonecido : {VALUE}"]
+                } ,     
+
+        ENUM
+            editora: { 
+            type: String ,
+            //Enum: opções limitadas e especificas já predefinidas.
+            //enum: ["C#" , "JS"]   //Verão simples
+            //Versão com mensagem personalizada
+            enum: { 
+                values : ["C#" , "JS"], 
+                message : "Editora '{VALUE}' não é um valor permitido."
+                } 
+            },
+
+        VALIDATE: funções de validação. deve ser escrito dessa forma
+
+                validate: (valor) =>{
+                    return valor >= 10 && valor <= 5000
+                }
+    
