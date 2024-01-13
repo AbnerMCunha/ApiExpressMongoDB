@@ -27,6 +27,8 @@ const livroSchecma = new mongoose.Schema(
       //min: [10,  "O número de páginas deve estar entre 10 e 5000. Valor fonecido : {VALUE}"],
       //max: [5000 ,  "O número de páginas deve estar entre 10 e 5000.Valor fonecido : {VALUE}"],
 
+
+      //VALIDATE e VALIDATOR: O validate não vai ser mais uma função, mas, sim, um objeto que envolverá o VALIDATOR, que é a função que realizará o retorno do valor para o objeto(que recebe o valor do campo (numeroPaginas neste caso) como argumento e retorna true se o valor for considerado válido, e false se não for. ), podemos adicionar uma propriedade message dentro de validate com a mensagem de erro personalizada.
       //Versão com message pesonalizada:
       numeroPaginas: {
         type: Number,
@@ -51,10 +53,10 @@ const livroSchecma = new mongoose.Schema(
 
 //O 1º parametro "livros" é a string referente à coleção livros da Database do MongoDB,
 //o 2º parametro é referente ao tipo de estrutura que será incorporado ao Modelo.
-const livro = mongoose.model("livros", livroSchecma);    //criando um livro com o schema do tipo livroSchecma
+const livros = mongoose.model("livros", livroSchecma);    //criando um livro com o schema do tipo livroSchecma
 
 //Models (modelos) e Schemas (esquemas) são conceitos que não são exclusivos do Mongoose. Eles estão relacionados a APIs e bancos de dados.
 
-export default livro;
+export default livros;
 
 

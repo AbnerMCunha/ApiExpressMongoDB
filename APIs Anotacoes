@@ -331,41 +331,87 @@ Node.js: Lidando com buscas, filtros, paginação e erros em uma API
             Esse middleware deve ser registrado após todas as outras rotas da aplicação. Assim, se nenhuma das rotas registradas tiver sido correspondida, o código desse middleware será executado. Em seguida, nele podemos criar um erro (no nosso caso, uma nova instância da classe NaoEncontrado) e enviá-lo para o manipulador de erros.
 
 
-    Aula 3 - Validações Mongoose
+    Aula 3 - 
+        1. Validações nativas do Mongoose
 
-         {VALUE} :  Para recuperar o valor definido na requisição ao tratar o erro de validação
+            {VALUE} :  Para recuperar o valor definido na requisição ao tratar o erro de validação
 
-        MIN MAX
-            Validação basica: 
-                Exemplo: Dentro da Declaração de propriedade Da ClasseSchema no modelo da entidade:
-                    numeroPaginas: {
-                        type: Number
-                        min: 10,
-                        max: 5000
-                    }
+            MIN MAX
+                Validação basica: 
+                    Exemplo: Dentro da Declaração de propriedade Da ClasseSchema no modelo da entidade:
+                        numeroPaginas: {
+                            type: Number
+                            min: 10,
+                            max: 5000
+                        }
 
-            Validação com personalização da Mensagem de respostas da validação.
-                paginas: { 
-                type: Number ,
-                min: [10,  "O número de páginas deve estar entre 10 e 5000. Valor fonecido : {VALUE}"],
-                max: [5000 ,  "O número de páginas deve estar entre 10 e 5000.Valor fonecido : {VALUE}"]
-                } ,     
+                Validação com personalização da Mensagem de respostas da validação.
+                    paginas: { 
+                    type: Number ,
+                    min: [10,  "O número de páginas deve estar entre 10 e 5000. Valor fonecido : {VALUE}"],
+                    max: [5000 ,  "O número de páginas deve estar entre 10 e 5000.Valor fonecido : {VALUE}"]
+                    } ,     
 
-        ENUM
-            editora: { 
-            type: String ,
-            //Enum: opções limitadas e especificas já predefinidas.
-            //enum: ["C#" , "JS"]   //Verão simples
-            //Versão com mensagem personalizada
-            enum: { 
-                values : ["C#" , "JS"], 
-                message : "Editora '{VALUE}' não é um valor permitido."
-                } 
-            },
+            ENUM
+                editora: { 
+                type: String ,
+                //Enum: opções limitadas e especificas já predefinidas.
+                //enum: ["C#" , "JS"]   //Verão simples
+                //Versão com mensagem personalizada
+                enum: { 
+                    values : ["C#" , "JS"], 
+                    message : "Editora '{VALUE}' não é um valor permitido."
+                    } 
+                },
+        
+        3.2. Validações por funções ou complexas
+            
+            VALIDATE e VALIDATOR: O validate não vai ser mais uma função, mas, sim, um objeto que envolverá o VALIDATOR, que é a função que realizará o retorno do valor para o objeto(que recebe o valor do campo (numeroPaginas neste caso) como argumento e retorna true se o valor for considerado válido, e false se não for. ), podemos adicionar uma propriedade message dentro de validate com a mensagem de erro personalizada.
 
-        VALIDATE: funções de validação. deve ser escrito dessa forma
-
-                validate: (valor) =>{
-                    return valor >= 10 && valor <= 5000
+            
+            Versão com message pesonalizada:
+                numeroPaginas: {
+                    type: Number,
+                    validate: {
+                    validator: (valor) => {
+                        return valor >= 10 && valor <= 5000;
+                    },
+                    message: "O número de páginas deve estar entre 10 e 5000. Valor fornecido: {VALUE}"
                 }
-    
+            
+            Se você deseja apenas definir uma mensagem de erro personalizada sem uma lógica de validação personalizada, você pode fazer algo assim:
+                numeroPaginas: {
+                        validate: {
+                        message: "O número de páginas deve estar entre 10 e 5000. Valor fornecido: {VALUE}"
+                    }
+                }
+
+        3.3 Validações Globais
+            1. é necessario importar num novo arquivo que unifique os modelos que serão validados e exportados
+            2. criar um novo arquivo que irá tratar globalmente os modelos.
+            3. Alterar os arquivos que importam os modelos diretamente, trocando a rota para definir o arquivo unificador.             
+                Exemplo: 
+                    arquivo unificador index.js:
+                                                
+                        import "./validadorGlobal.js";
+                        import { autor } from "./Autor.js";
+                        import livros from "./Livro.js";
+
+                        export { autor, livros };
+
+                    arquivo validador global validadorGlobal.js
+
+                        import mongoose from "mongoose";
+
+                        console.log("Passei por aqui");
+
+                        mongoose.Schema.Types.String.set("validate", {
+                        validator: (valor) => valor.trim() !== "",
+                        message: ({ path }) => `O campo ${path} foi fornecido em branco.`
+                        //message: () => `Um campo foi fornecido em branco.`  //Sem utilizar parametros
+                        });
+
+                    arquivos que importam os modelos, alterados importar os arquivos validados
+
+                        import { livros } from "../models/index.js";    // ao inves de "../models/livros.js";
+                        import { autor } from "../models/index.js";       // ao inves de "../models/autor.js";

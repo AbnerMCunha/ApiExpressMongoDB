@@ -1,6 +1,6 @@
 //import mongoose from "mongoose";  //Import para tratamento de Erros com o mongoose.Error.CastError
 import NaoEncontrado from "../erros/NaoEncontrado.js";
-import {autor} from "../models/Autor.js";
+import {autor} from "../models/index.js";
 
 
 //nota:dentro de funções assíncronas, que é o caso dos métodos de controladores que estamos trabalhando, a função next deve ser obrigatoriamente utilizada para encaminhar qualquer erro que foi criado ou que tenha sido lançado e capturado com o bloco try...catch.
@@ -10,7 +10,7 @@ class AutorController{
   static cadastrarAutor =  async (req, res, next)=>{
     try{
       const meuAutor = await autor.create(req.body);
-      res.status(201).send({message : "Autor cadastrado com Sucesso!" , autor : meuAutor });
+      res.status(201).send({message : "Autor cadastrado com Sucesso!" , autores : meuAutor });
     }catch(erro){
       next(erro) ; //res.status(500).send({message : `Erro ao Cadastrar Autor ${erro.message}`});
     }
