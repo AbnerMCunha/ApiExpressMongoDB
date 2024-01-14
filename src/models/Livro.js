@@ -22,24 +22,23 @@ const livroSchecma = new mongoose.Schema(
       } 
     },
     preco: { type: Number } ,
-    paginas: { 
-      type: Number ,
-      //min: [10,  "O número de páginas deve estar entre 10 e 5000. Valor fonecido : {VALUE}"],
-      //max: [5000 ,  "O número de páginas deve estar entre 10 e 5000.Valor fonecido : {VALUE}"],
+ 
+    //min: [10,  "O número de páginas deve estar entre 10 e 5000. Valor fonecido : {VALUE}"],
+    //max: [5000 ,  "O número de páginas deve estar entre 10 e 5000.Valor fonecido : {VALUE}"],
 
 
-      //VALIDATE e VALIDATOR: O validate não vai ser mais uma função, mas, sim, um objeto que envolverá o VALIDATOR, que é a função que realizará o retorno do valor para o objeto(que recebe o valor do campo (numeroPaginas neste caso) como argumento e retorna true se o valor for considerado válido, e false se não for. ), podemos adicionar uma propriedade message dentro de validate com a mensagem de erro personalizada.
-      //Versão com message pesonalizada:
-      numeroPaginas: {
-        type: Number,
-        validate: {
-          validator: (valor) => {
-            return valor >= 10 && valor <= 5000;
-          },
-          message: "O número de páginas deve estar entre 10 e 5000. Valor fornecido: {VALUE}"
-        }
-      } 
-    },
+    //VALIDATE e VALIDATOR: O validate não vai ser mais uma função, mas, sim, um objeto que envolverá o VALIDATOR, que é a função que realizará o retorno do valor para o objeto(que recebe o valor do campo (numeroPaginas neste caso) como argumento e retorna true se o valor for considerado válido, e false se não for. ), podemos adicionar uma propriedade message dentro de validate com a mensagem de erro personalizada.
+    //Versão com message pesonalizada:
+    paginas: {
+      type: Number,
+      validate: {
+        validator: (valor) => {
+          return valor >= 10 && valor <= 5000;
+        },
+        message: "O número de páginas deve estar entre 10 e 5000. Valor fornecido: {VALUE}"
+      }
+    } 
+    ,
     //autor :  { type: String } ,   //1. Sem vinculação de entidade no atributo string;
     //autor :  autorSchema          //2. Vinculação de Entidades/Modelos por Embbeding. Altera o Cadastro do Livro. na pratica, ele salva as informações do registro no momento do cadastro. se o objeto real posteriomente for alterado. pelo embedding, nos outros lugares que não tiver sido alterado. se manterá desatualizado.
     autor : { type: mongoose.Schema.ObjectId, ref: "autores", 

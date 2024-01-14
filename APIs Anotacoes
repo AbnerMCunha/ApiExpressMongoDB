@@ -415,3 +415,16 @@ Node.js: Lidando com buscas, filtros, paginação e erros em uma API
 
                         import { livros } from "../models/index.js";    // ao inves de "../models/livros.js";
                         import { autor } from "../models/index.js";       // ao inves de "../models/autor.js";
+
+        4. Filtrar com mongoose / regex
+
+            1. forma literal: entre barras
+                const regex = /minha busca literal/
+
+            2. instanciando regex
+                const busca = {};
+                const regex = new RegExp(titulo, "i");
+                if (titulo) busca.editora = regex;
+                
+            3. operadores regex: o paramentro i de options significa uma busca independendo do capas lock
+                if (titulo) busca.titulo = {$regex: titulo, $options: "i" };  

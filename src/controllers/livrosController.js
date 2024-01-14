@@ -8,20 +8,8 @@ import NaoEncontrado from "../erros/NaoEncontrado.js";
 
 class LivroController {
 
-  //Em conexões com o banco de dados é sempre interessante utilziar metodos asyncronos para não alterar mesmo registro ao mesmo tempo.
+  //Em conexões com o banco de dados é sempre interessante utiliziar metodos asincronos para não alterar mesmo registro ao mesmo tempo.
 
-  //Fazendo uma busca/pesquisa por Editora. Exemplo: http://localhost:3000/livros?editora=Classicos
-  static listarLivrosPorEditora = async (req, res, next) => {   
-    const editoraQ = req.query.editora;    
-    try {
-      //callback da função deve ser definida como assincrona. async antes do callback e await ao receber o conteudo da consulta na coleção pelo find.       
-      const listaLivros = await livros.find({ editora : editoraQ}); //O find é quem se conecta a coleção, busca e retorna tudo que ele encontrar por lá.
-      res.status(200).json(listaLivros );
-    } catch (erro) {
-      next( erro ) ; 
-      //res.status(500).json({ message: `${erro.message} - falha na requisição` });
-    }
-  };
 
   static listarLivros = async (req, res, next) => {   
     try {      
@@ -136,6 +124,57 @@ class LivroController {
   //   }
   // }
 
+
+  static listarLivrosPorFiltro = async (req, res, next) => {   
+
+    try {
+
+      const busca = processaBusca(req.query);   
+      console.log(busca);
+  
+      //callback da função deve ser definida como assincrona. async antes do callback e await ao receber o conteudo da consulta na coleção pelo find.       
+      //const listaLivros = await livros.find({ editora : editoraQ}); //O find é quem se conecta a coleção, busca e retorna tudo que ele encontrar por lá.
+      const listaLivros = await livros.find(busca); 
+      res.status(200).json(listaLivros );
+    } catch (erro) {
+      next( erro ) ; 
+      //res.status(500).json({ message: `${erro.message} - falha na requisição` });
+    }
+  };
+
+
 }
 
+
+function processaBusca(parametros){
+
+
+  
+
+  //const editoraQ = parametros.editora;
+  //const regex = new RegExp(titulo, "i"); //forma 1 de utilizar o regex com case insensitive, isso permite buscar por partes da string, não ele exata.
+
+  const { editora, titulo, minPaginas, maxPaginas ,} = parametros;
+
+  const busca = {}; //variavel que concateneara os filtros, se houverem.    
+  //if (editora) busca.editora = editora; //se houver, concatena.
+  //if (titulo) busca.titulo = titulo;
+
+  //if (titulo) busca.titulo = regex;   //forma 1 de utilização de regex
+  //if (titulo) busca.titulo = /aprendendo/;   //forma 2 de utilização de regex, de forma literal.
+  if (titulo) busca.titulo = { $regex: titulo, $options: "i" };  // forma 3, por operadores de regex, o paramentro i de options significa uma busca independendo do capas lock  
+  if (editora) busca.editora = editora; //não escrever assim, pois editora é campo enum: {$regex: editora, $options: "i" };   
+
+  //adicionando novos filtros: 
+  if ( minPaginas || maxPaginas ) busca.paginas = {};   //É NECESSARIO iniciar o campo paginas, se não dá erro interno no servidor : TypeError: Cannot set properties of undefined (setting '$gte')
+  if (minPaginas) busca.paginas.$gte = minPaginas;
+  if (maxPaginas) busca.paginas.$lte = maxPaginas;
+  //Erro: se escrever dessa forma, os atributos de min e max se sobrescreverão de acordo com quem vem por ultimo, não deixando concatenar outro filtro de paginas
+  //if (minPaginas) busca.paginas = { $gte: minPaginas };  
+  //if (maxPaginas) busca.paginas = { $lte: maxPaginas} ;   
+
+
+  return busca;
+
+}
 export default LivroController;
