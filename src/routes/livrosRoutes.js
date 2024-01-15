@@ -7,7 +7,7 @@ const routes = express.Router();    // Cria um objeto Router do Express que pode
 
 //Definição de Rotas:
 routes.get("/livros", LivroController.listarLivros);                    //http://localhost:3000/livros        
-routes.get("/livros/busca", LivroController.listarLivrosPorFiltro);    //http://localhost:3000/livros/busca?editora=Classicos
+routes.get("/livros/busca", LivroController.listarLivroPorFiltro);    //http://localhost:3000/livros/busca?editora=Classicos
 routes.get("/livros/:id", LivroController.listarLivroPorId);            //http://localhost:3000/livros/657bbb0c37338579afda5204
 routes.post("/livros", LivroController.cadastrarLivroPorReferencing);   //Demonstrado as diferenças de vinvulação de collections por Embbeding e Referencing
 routes.put("/livros/:id", LivroController.atualizarLivro);

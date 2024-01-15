@@ -17,7 +17,7 @@ const livroSchecma = new mongoose.Schema(
       //enum: ["C#" , "JS"]   //Verão simples
       //Versão com mensagem personalizada
       enum: { 
-        values : ["C#" , "JS"], 
+        values : ["Classicos" , "JS"], 
         message : "Editora '{VALUE}' não é um valor permitido."
       } 
     },
