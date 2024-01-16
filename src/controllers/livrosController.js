@@ -3,7 +3,7 @@ import { autor } from "../models/index.js";   //Ao importar de scripts que não 
 //import autor from "../models/Autor.js";     //Se importar assim, daria erro
 
 import NaoEncontrado from "../erros/NaoEncontrado.js";
-//import ErroValidacao from "../erros/ErroValidacao.js";
+import RequisicaoIncorreta from "../erros/RequisicaoIncorreta.js";
 //import mongoose from "mongoose";
 
 class LivroController {
@@ -21,8 +21,27 @@ class LivroController {
       //Recebendo por Referencia ao invés de embbeding
       //Quando usamos references o autor não faz mais parte do objeto livros. Assim, cada livro deve ser “populado” com as referências do autor.
       //.populate("autor").exec()
-      const listaLivros = await livros.find({}).populate("autor").exec();
-      res.status(200).json(listaLivros );
+
+      //Implementando a Paginação
+      let {limite = 5 , pagina = 1} = req.query;    //http://localhost:3000/livros?pagina=2
+
+      limite = parseInt(limite);
+      pagina = parseInt(pagina);
+      
+      console.log(limite , pagina);
+
+      if(limite > 0 && pagina > 0 ){
+
+        const listaLivros = await livros.find({})
+          .skip( ( pagina - 1 ) * limite )                  // Se for solicitado a página 1, pagina - 1 será igual a 0. Como nosso limite é 5, obtemos 0 * 5 que resulta em 0 livros pulados. Se a pessoa solicitar a página 2, pagina - 1 será igual a 1. Como limite é 5, 1 * 5 resultará em 5 livros pulados. Em outras palavras, a quantidade de livros pulados também depende do limite de livros exibidos em cada página.
+          .limit(limite)                                    // Passando o limite recebido como parâmetro de busca. limitando a quantidade de livros exibidos na tela. Sem ele, apenas pularíamos os primeiros elementos e mostraríamos os demais resultados até o fim.
+          .populate("autor").exec();  
+
+        res.status(200).json(listaLivros );
+      }else{
+        next( new RequisicaoIncorreta() );  //Encaminhando para o Manipulador de Erros 
+      }      
+
     } catch (erro) {
       next( erro ) ; 
       //res.status(500).json({ message: `${erro.message} - falha na requisição` });

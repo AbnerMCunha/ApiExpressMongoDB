@@ -30,7 +30,7 @@ function ManipuladorDeErros(erro, req, res, next){
     new ErroValidacao(erro).enviarResposta(res);  //Passando o parametro do Erro para ser tratado de forma personalizada.
 
   }
-  else if( erro instanceof NaoEncontrado){
+  else if( erro instanceof ErroBase){  //alterando, verificação de instancia NaoEncontrado, para o ErroBase, que está antes na cadeia de Herança e assim, consegue utilizar o polimorfismo para entregar o erro correto ao usuario.
 
     //Erro de definição de Rota, redirecionando para pagina não encontrada.    
     erro.enviarResposta(res) ;    //Se erro for instancia de Nao Encontrado, o erro pode acessar os atributos da classe nao encontrado tambem.
