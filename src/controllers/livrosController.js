@@ -3,50 +3,22 @@ import { autor } from "../models/index.js";   //Ao importar de scripts que não 
 //import autor from "../models/Autor.js";     //Se importar assim, daria erro
 
 import NaoEncontrado from "../erros/NaoEncontrado.js";
-import RequisicaoIncorreta from "../erros/RequisicaoIncorreta.js";
-//import mongoose from "mongoose";
 
 class LivroController {
 
   //Em conexões com o banco de dados é sempre interessante utiliziar metodos asincronos para não alterar mesmo registro ao mesmo tempo.
-
-
   static listarLivros = async (req, res, next) => {   
-    try {      
-
-      //Testando o Manipulador de Erros.:
-      //throw new ErroValidacao() ; //throw new NaoEncontrado(); // mongoose.Error.ValidationError ;//mongoose.Error.CastError(); //ErroBase(); //Error();
-
-      //const listaLivros = await livros.find({});       //Se fosse receber autor por embedding
-      //Recebendo por Referencia ao invés de embbeding
-      //Quando usamos references o autor não faz mais parte do objeto livros. Assim, cada livro deve ser “populado” com as referências do autor.
-      //.populate("autor").exec()
-
-      //Implementando a Paginação
-      let {limite = 5 , pagina = 1,  campoOrdenacao = "_id", ordem = -1} = req.query;    //http://localhost:3000/livros?pagina=2
-
-      limite = parseInt(limite);
-      pagina = parseInt(pagina);
+    try {   
+      const buscaLivros = livros.find(); //Auto Popular referencias. Passo 5: não é mais necessário popular autor, pois já foi adicionado o plugin mongoose, para popular dados de referencia, no modelo livros.js .populate("autor");   
+      req.resultado = buscaLivros;
       
-      console.log(limite , pagina);
+      next(); //chamando middleware de paginação e enviando resposta a requisição;
 
-      if(limite > 0 && pagina > 0 ){
-
-        const listaLivros = await livros.find({})
-          .sort({ [campoOrdenacao]: ordem })
-          .skip( ( pagina - 1 ) * limite )                  // Se for solicitado a página 1, pagina - 1 será igual a 0. Como nosso limite é 5, obtemos 0 * 5 que resulta em 0 livros pulados. Se a pessoa solicitar a página 2, pagina - 1 será igual a 1. Como limite é 5, 1 * 5 resultará em 5 livros pulados. Em outras palavras, a quantidade de livros pulados também depende do limite de livros exibidos em cada página.
-          .limit(limite)                                    // Passando o limite recebido como parâmetro de busca. limitando a quantidade de livros exibidos na tela. Sem ele, apenas pularíamos os primeiros elementos e mostraríamos os demais resultados até o fim.
-          .populate("autor").exec();  
-
-        res.status(200).json(listaLivros );
-      }else{
-        next( new RequisicaoIncorreta() );  //Encaminhando para o Manipulador de Erros 
-      }      
-
-    } catch (erro) {
-      next( erro ) ; 
-      //res.status(500).json({ message: `${erro.message} - falha na requisição` });
+    }catch(e){
+      next(e);
     }
+      
+
   };
 
   static listarLivroPorId  = async (req, res, next) => {   
@@ -55,7 +27,10 @@ class LivroController {
       const livroEncontrado = await livros.findById(id);
 
       if(livroEncontrado){
-        res.status(200).json(livroEncontrado);
+        const livroResultado = await livros.findById(id, {}, { autopopulate: false });
+        req.resultado = livroResultado;
+        next();
+        //res.status(200).json(livroEncontrado);
       }else{
         next(new NaoEncontrado("Livro não encontrado"));
       } 
@@ -150,22 +125,27 @@ class LivroController {
 
     try {
 
-      const busca = await processaBusca(req.query);     //Teste: http://localhost:3000/livros/busca?minPaginas=100&maxPaginas=200&nomeAutor=Assis
-      console.log(busca);
+      const busca = await processaBusca(req.query);     //Teste: http://localhost:3000/livros/busca?minPaginas=100&maxPaginas=200&nomeAutor=Assis //http://localhost:3000/livros?pagina=1&campoOrdenacao=editora&ordem=1      
+      //console.log(busca);
   
       if(busca !== null ){
-      //callback da função deve ser definida como assincrona. async antes do callback e await ao receber o conteudo da consulta na coleção pelo find.       
-      //const listaLivros = await livros.find({ editora : editoraQ}); //O find é quem se conecta a coleção, busca e retorna tudo que ele encontrar por lá.
-        const listaLivros = await livros.find(busca).populate("autor");   //populando pesquisa com os autores, já que estamos buscando o nome do autor, que não existe na "tabela" de livros.
-        res.status(200).json( listaLivros );
+        //callback da função deve ser definida como assincrona. async antes do callback e await ao receber o conteudo da consulta na coleção pelo find.       
+        //const listaLivros = await livros.find({ editora : editoraQ}); //O find é quem se conecta a coleção, busca e retorna tudo que ele encontrar por lá.
+        //const listaLivros = await livros.find(busca).populate("autor");   //populando pesquisa com os autores, já que estamos buscando o nome do autor, que não existe na "tabela" de livros.
+        
+        const listaLivros = livros.find(busca); //Auto Popular referencias. Passo 5: não é mais necessário popular autor, pois já foi adicionado o plugin mongoose, para popular dados de referencia, no modelo livros.js : livros.find(busca).populate("autor");
+        req.resultado = listaLivros;        
+        next();        //não precisa mais dessa linha(a frente) pois o middleware, registrado após em rotas, retornar a resposta já com a paginação.  res.status(200).json( listaLivros );
       }else{
         res.status(200).json( [] ); //Caso os filtros não encontrarem nada, retornar uma lista vazia ao invés de um erro.
       }
+
     } catch (erro) {
       next( erro ) ; 
       //res.status(500).json({ message: `${erro.message} - falha na requisição` });
     }
   };
+  
 }
 
 
@@ -208,6 +188,8 @@ async function processaBusca(parametros){
       busca = null;
     }         
   }
+  
+  //console.log( busca ); 
 
   return busca;
 }

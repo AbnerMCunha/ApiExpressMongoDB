@@ -18,8 +18,16 @@ class AutorController{
 
   static listarAutores = async(req, res, next) => {
     try{
-      const lista = await autor.find({});
-      res.status(200).json(lista);
+      // const buscaLivros = livros.find();   
+      // req.resultado = buscaLivros;
+      // req.origem = "livros";
+      // next();
+
+      const lista =  autor.find();
+      req.resultado = lista;
+      req.origem = "autores";      
+      next();
+      //res.status(200).json(lista);
     }catch( erro ) {
       next( erro ) ; //res.status(500).send( { message: `Falhar na Requisição de Autores : ${erro.message}`});
     }
