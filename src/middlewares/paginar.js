@@ -14,9 +14,7 @@ async function paginar(req, res, next){
     ordem = parseInt(ordem);
 
     const resultado = req.resultado;
-
-    console.log( limite, pagina, ordem, resultado );
-
+    
     if (limite > 0 && pagina > 0) {
       const resultadoPaginado = await resultado.find()
         .sort({ [campoOrdenacao]: ordem })
